@@ -1,0 +1,23 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "visualize-project"
+version = "0.1.0"
+description = "Build a class graph from source directories."
+requires-python = ">=3.11"
+dependencies = [
+    "tree-sitter==0.24.0",
+    "tree-sitter-java==0.23.5",
+    "tree-sitter-scala==0.23.4",
+    "tree-sitter-kotlin==1.1.0",
+    "tree-sitter-python==0.23.6",
+    "networkx==3.4.2",
+]
+
+[project.scripts]
+visualize-project = "visualize_project:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/visualize_project"]
