@@ -162,6 +162,8 @@ def extract_symbols(path: Path):
         method_nodes = captures.get("method.name", [])
 
         for class_node in class_nodes:
+            if not class_node.text:
+                continue
             class_name = class_node.text.decode()
             class_id   = f"{path}::{class_name}"
             classes[class_id] = {
@@ -172,6 +174,8 @@ def extract_symbols(path: Path):
                 "package": package or "",
             }
             for method_node in method_nodes:
+                if not method_node.text:
+                    continue
                 methods.append({
                     "name":     method_node.text.decode(),
                     "id":       f"{class_id}::{method_node.text.decode()}",
@@ -184,6 +188,8 @@ def extract_symbols(path: Path):
     if "functions" in queries:
         for _, captures in queries["functions"].matches(root):
             for func_node in captures.get("function.name", []):
+                if not func_node.text:
+                    continue
                 func_name = func_node.text.decode()
                 functions.append({
                     "name":      func_name,
@@ -211,7 +217,7 @@ def extract_symbols(path: Path):
                     if start_line <= call_line and start_line > best_start:
                         best_start = start_line
                         best = container_id
-                if best:
+                if best and ctor_node.text:
                     ctor_calls.append((best, ctor_node.text.decode()))
 
     return package, list(classes.values()), methods, functions, ctor_calls
