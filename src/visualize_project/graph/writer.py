@@ -8,11 +8,17 @@ from visualize_project.constants import LANG_MAP, node_colour
 from visualize_project.graph.reader import extract_symbols, python_module_name
 
 
-def _add_package(G: nx.DiGraph, package: str) -> None:
-    if G.has_node(package):
-        return
-    r, g, b = node_colour("package")
-    G.add_node(package, kind="package", name=package, label=package, r=r, g=g, b=b)
+def _add_package(G: nx.DiGraph, package: str, sep: str = ".") -> None:
+    parts = package.split(sep)
+    for i in range(len(parts)):
+        full = sep.join(parts[: i + 1])
+        if not G.has_node(full):
+            r, g, b = node_colour("package")
+            G.add_node(full, kind="package", name=full, label=full, r=r, g=g, b=b)
+        if i > 0:
+            parent = sep.join(parts[:i])
+            if not G.has_edge(parent, full):
+                G.add_edge(parent, full, rel="contains")
 
 
 def _add_module(G: nx.DiGraph, path: Path, package: str | None) -> str:
