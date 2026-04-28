@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "visualize-project"
+name = "pgt"
 version = "0.1.0"
 description = "Build a class graph from source directories."
 requires-python = ">=3.11"

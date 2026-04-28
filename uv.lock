@@ -12,6 +12,29 @@ wheels = [
 ]
 
 [[package]]
+name = "pgt"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "networkx" },
+    { name = "tree-sitter" },
+    { name = "tree-sitter-java" },
+    { name = "tree-sitter-kotlin" },
+    { name = "tree-sitter-python" },
+    { name = "tree-sitter-scala" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "networkx", specifier = "==3.4.2" },
+    { name = "tree-sitter", specifier = "==0.24.0" },
+    { name = "tree-sitter-java", specifier = "==0.23.5" },
+    { name = "tree-sitter-kotlin", specifier = "==1.1.0" },
+    { name = "tree-sitter-python", specifier = "==0.23.6" },
+    { name = "tree-sitter-scala", specifier = "==0.23.4" },
+]
+
+[[package]]
 name = "tree-sitter"
 version = "0.24.0"
 source = { registry = "https://pypi.org/simple" }
@@ -98,27 +121,4 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/8c/05/26a7684308c51d69ae6bac946cb3506825b273b253ff8bee489f0dfd5638/tree_sitter_scala-0.23.4-cp39-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:c64c72ea343df167e0c0b07bdf2722d3af89d61571e737c40451f0d77992396f", size = 543459, upload-time = "2024-12-27T04:46:00.583Z" },
     { url = "https://files.pythonhosted.org/packages/0c/16/eb7bed2592e31ec7e762c1a30001181e71030f502f7e88d49ed0793b99b0/tree_sitter_scala-0.23.4-cp39-abi3-win_amd64.whl", hash = "sha256:c07eb3f7a9b6710bd822dfb4e54526861e9f132e53cceef3d272fc1096b7ab48", size = 453347, upload-time = "2024-12-27T04:46:01.721Z" },
     { url = "https://files.pythonhosted.org/packages/36/c6/c9d91ad3e04922744b931187e1544fdfefe2fd1fb76506e99399514ebe8a/tree_sitter_scala-0.23.4-cp39-abi3-win_arm64.whl", hash = "sha256:ddf6b5db72a7ef6cd343049a91c6ce0dd85c423f6dead4bd7c4cbc5aa003d31f", size = 455006, upload-time = "2024-12-27T04:46:04.185Z" },
-]
-
-[[package]]
-name = "visualize-project"
-version = "0.1.0"
-source = { editable = "." }
-dependencies = [
-    { name = "networkx" },
-    { name = "tree-sitter" },
-    { name = "tree-sitter-java" },
-    { name = "tree-sitter-kotlin" },
-    { name = "tree-sitter-python" },
-    { name = "tree-sitter-scala" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "networkx", specifier = "==3.4.2" },
-    { name = "tree-sitter", specifier = "==0.24.0" },
-    { name = "tree-sitter-java", specifier = "==0.23.5" },
-    { name = "tree-sitter-kotlin", specifier = "==1.1.0" },
-    { name = "tree-sitter-python", specifier = "==0.23.6" },
-    { name = "tree-sitter-scala", specifier = "==0.23.4" },
 ]
