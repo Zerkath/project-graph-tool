@@ -1,5 +1,6 @@
-"""Pretty-print the graph to stdout and write GEXF / GraphML files."""
+"""Pretty-print the graph to stdout and write a graphology JSON file."""
 
+import json
 from pathlib import Path
 
 import networkx as nx
@@ -53,11 +54,27 @@ def print_summary(G: nx.DiGraph) -> None:
             print(f"    └─ {d['name']}  ({d['file']}:{d['line']})")
 
 
-def write_graph_files(G: nx.DiGraph) -> None:
-    gexf_out = Path("class_graph.gexf")
-    nx.write_gexf(G, gexf_out)
-    print(f"\nGraph written to {gexf_out}")
+def _to_graphology(G: nx.DiGraph) -> dict:
+    return {
+        "options": {
+            "type": "directed",
+            "multi": False,
+            "allowSelfLoops": True,
+        },
+        "attributes": {},
+        "nodes": [
+            {"key": str(n), "attributes": dict(data)}
+            for n, data in G.nodes(data=True)
+        ],
+        "edges": [
+            {"source": str(u), "target": str(v), "attributes": dict(data)}
+            for u, v, data in G.edges(data=True)
+        ],
+    }
 
-    gml_out = Path("class_graph.graphml")
-    nx.write_graphml(G, gml_out)
-    print(f"Graph written to {gml_out}")
+
+def write_graph_files(G: nx.DiGraph) -> None:
+    out = Path("class_graph.json")
+    with out.open("w", encoding="utf-8") as f:
+        json.dump(_to_graphology(G), f, ensure_ascii=False, indent=2)
+    print(f"\nGraph written to {out}")

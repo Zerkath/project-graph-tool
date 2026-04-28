@@ -1,11 +1,15 @@
-# Project graph tool
+# Project Graph Tool
 
-Simple python utility to produce [gexf](https://gexf.net/) and [graphml](https://en.wikipedia.org/wiki/GraphML) files.
+Simple python utility that scans source directories and produces a class graph as a [graphology](https://graphology.github.io/serialization.html) JSON file (`class_graph.json`).
 
-Which can be displayed in [Gephi Lite](https://lite.gephi.org)
+The output is consumable by [sigma.js](https://www.sigmajs.org/) for rendering in the browser.
+
+Possible to use [Gephi Lite 1.0.1](https://lite.gephi.org/v1.0.1/)
+
+[Currently open issue preventing use of 1.0.2](https://github.com/gephi/gephi-lite/issues/290)
+[Pending 1.1.0 release](https://github.com/gephi/gephi-lite/milestone/2)
 
 ![Vizualiation of this project](vizualization.jpg)
-
 
 ```sh
 uvx --from git+ssh://git@github.com/Zerkath/project-graph-tool.git visualize-project
