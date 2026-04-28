@@ -9,7 +9,8 @@ Possible to use [Gephi Lite 1.0.1](https://lite.gephi.org/v1.0.1/)
 [Currently open issue preventing use of 1.0.2](https://github.com/gephi/gephi-lite/issues/290)
 [Pending 1.1.0 release](https://github.com/gephi/gephi-lite/milestone/2)
 
-![Vizualiation of this project](vizualization.jpg)
+![Vizualization of this project](/images/vizualization.jpg)
+![Vizualization of my Chess Engine](/images/rosemary.jpg)
 
 ```sh
 uvx --from git+ssh://git@github.com/Zerkath/project-graph-tool.git visualize-project
