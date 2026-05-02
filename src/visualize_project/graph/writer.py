@@ -55,8 +55,8 @@ def _add_function(G: nx.DiGraph, fn: dict) -> None:
     G.add_edge(fn["module_id"], fn["id"], rel="has_function")
 
 
-def _ingest_file(G: nx.DiGraph, path: Path) -> list[tuple[str, str]]:
-    package, classes, methods, functions, ctor_calls = extract_symbols(path)
+def _ingest_file(G: nx.DiGraph, path: Path):
+    package, classes, methods, functions, ctor_calls, imports = extract_symbols(path)
     is_python = path.suffix == ".py"
 
     if package:
@@ -72,7 +72,8 @@ def _ingest_file(G: nx.DiGraph, path: Path) -> list[tuple[str, str]]:
     for fn in functions:
         _add_function(G, fn)
 
-    return ctor_calls
+    file_imports = [(package or "", path.suffix, rel_dots, target) for target, rel_dots in imports]
+    return ctor_calls, file_imports
 
 
 def _iter_source_files(dirs: list[Path]):
@@ -90,6 +91,67 @@ def _index_classes_by_name(G: nx.DiGraph) -> dict[str, list[str]]:
     return index
 
 
+def _resolve_import_to_package(
+    target: str, dots: int, src_package: str, packages: set[str], sep: str
+) -> str | None:
+    """Find the deepest known package matching the import.
+
+    Python relative imports (``dots > 0``) are first rebased onto the
+    source file's package — `from . import x` inside ``a.b`` becomes
+    ``a.b.x``; ``..`` walks up further. JVM-style imports always carry
+    the fully-qualified path (``a.b.c.Class``) — strip trailing
+    segments until the prefix matches a known package.
+    """
+    if dots > 0:
+        if not src_package:
+            return None
+        parts = src_package.split(sep)
+        if dots > len(parts):
+            return None
+        base = parts[: len(parts) - (dots - 1)]
+        target = sep.join(filter(None, [sep.join(base), target])).strip(sep)
+
+    if not target:
+        return None
+
+    parts = target.split(sep)
+    while parts:
+        candidate = sep.join(parts)
+        if candidate in packages and candidate != src_package:
+            return candidate
+        parts.pop()
+    return None
+
+
+def _add_import_edges(
+    G: nx.DiGraph,
+    file_imports: list[tuple[str, str, int, str]],
+) -> None:
+    packages = {n for n, d in G.nodes(data=True) if d.get("kind") == "package"}
+    edge_weights: dict[tuple[str, str], int] = {}
+
+    for src_package, suffix, dots, target in file_imports:
+        if not src_package:
+            continue
+        sep = "." if suffix == ".py" else "."
+        resolved = _resolve_import_to_package(target, dots, src_package, packages, sep)
+        if not resolved:
+            continue
+        edge_weights[(src_package, resolved)] = edge_weights.get((src_package, resolved), 0) + 1
+
+    for (src, dst), weight in edge_weights.items():
+        if G.has_edge(src, dst):
+            existing = G.edges[src, dst]
+            if existing.get("rel") == "imports":
+                existing["weight"] = existing.get("weight", 1) + weight
+            else:
+                # Don't clobber a `contains` edge — annotate it instead so the
+                # import signal is still preserved in the serialized graph.
+                existing["import_weight"] = existing.get("import_weight", 0) + weight
+            continue
+        G.add_edge(src, dst, rel="imports", weight=weight)
+
+
 def _add_instantiation_edges(G: nx.DiGraph, ctor_calls: list[tuple[str, str]]) -> None:
     name_to_ids = _index_classes_by_name(G)
     for caller_id, target_name in ctor_calls:
@@ -103,9 +165,13 @@ def _add_instantiation_edges(G: nx.DiGraph, ctor_calls: list[tuple[str, str]]) -
 def build_graph(dirs: list[Path]) -> nx.DiGraph:
     G = nx.DiGraph()
     all_ctor_calls: list[tuple[str, str]] = []
+    all_imports: list[tuple[str, str, int, str]] = []
 
     for path in _iter_source_files(dirs):
-        all_ctor_calls.extend(_ingest_file(G, path))
+        ctor_calls, file_imports = _ingest_file(G, path)
+        all_ctor_calls.extend(ctor_calls)
+        all_imports.extend(file_imports)
 
     _add_instantiation_edges(G, all_ctor_calls)
+    _add_import_edges(G, all_imports)
     return G

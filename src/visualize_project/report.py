@@ -22,10 +22,12 @@ def print_summary(G: nx.DiGraph) -> None:
     methods    = [(n, d) for n, d in G.nodes(data=True) if d.get("kind") == "method"]
     functions  = [(n, d) for n, d in G.nodes(data=True) if d.get("kind") == "function"]
     inst_edges = [(u, v) for u, v, d in G.edges(data=True) if d.get("rel") == "instantiates"]
+    imp_edges  = [(u, v, d) for u, v, d in G.edges(data=True) if d.get("rel") == "imports"]
 
     print(f"\nFound {len(packages)} packages, {len(modules)} modules, {len(classes)} classes, "
           f"{len(methods)} methods, {len(functions)} functions, "
-          f"{len(inst_edges)} instantiation edges:\n")
+          f"{len(inst_edges)} instantiation edges, "
+          f"{len(imp_edges)} package-import edges:\n")
 
     for pkg_id, pkg in sorted(packages, key=lambda x: x[1]["name"]):
         print(f"  pkg  {pkg['name']}")
@@ -46,6 +48,12 @@ def print_summary(G: nx.DiGraph) -> None:
         print("\n  Instantiation edges:")
         for u, v in sorted(inst_edges, key=lambda e: G.nodes[e[0]].get("name", "")):
             print(f"    {G.nodes[u]['name']}  →  {G.nodes[v]['name']}")
+
+    if imp_edges:
+        print("\n  Package import edges:")
+        for u, v, d in sorted(imp_edges, key=lambda e: (e[0], e[1])):
+            weight = d.get("weight", 1)
+            print(f"    {u}  →  {v}  (×{weight})")
 
     orphans = [(n, d) for n, d in classes if not d.get("package")]
     if orphans:

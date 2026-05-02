@@ -33,22 +33,26 @@ QUERIES = {
         "package": _load(JAVA,   "java",   "package"),
         "classes": _load(JAVA,   "java",   "classes"),
         "ctor":    _load(JAVA,   "java",   "ctor"),
+        "imports": _load(JAVA,   "java",   "imports"),
     },
     ".scala": {
         "package": _load(SCALA,  "scala",  "package"),
         "classes": _load(SCALA,  "scala",  "classes"),
         "ctor":    _load(SCALA,  "scala",  "ctor"),
+        "imports": _load(SCALA,  "scala",  "imports"),
     },
     ".kt": {
         "package": _load(KOTLIN, "kotlin", "package"),
         "classes": _load(KOTLIN, "kotlin", "classes"),
         "ctor":    _load(KOTLIN, "kotlin", "ctor"),
+        "imports": _load(KOTLIN, "kotlin", "imports"),
     },
     ".py": {
         "package":   _load(PYTHON, "python", "package"),
         "classes":   _load(PYTHON, "python", "classes"),
         "ctor":      _load(PYTHON, "python", "ctor"),
         "functions": _load(PYTHON, "python", "functions"),
+        "imports":   _load(PYTHON, "python", "imports"),
     },
 }
 

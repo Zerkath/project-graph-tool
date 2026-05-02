@@ -32,8 +32,46 @@ def extract_package(path: Path, root_node, queries: dict) -> str | None:
     return None
 
 
+def extract_imports(root_node, queries: dict) -> list[tuple[str, int]]:
+    """Returns list of (import_path_or_relative_marker, dot_count_for_relative)."""
+    if "imports" not in queries:
+        return []
+    results: list[tuple[str, int]] = []
+    for _, captures in queries["imports"].matches(root_node):
+        for cap_name, nodes in captures.items():
+            for node in nodes:
+                if not node.text:
+                    continue
+                text = node.text.decode().strip()
+                if cap_name == "import.scala_raw":
+                    # Strip leading 'import', take dotted prefix before any '{' or '_'.
+                    raw = text
+                    if raw.startswith("import"):
+                        raw = raw[len("import"):].strip()
+                    cut = len(raw)
+                    for marker in ("{", " "):
+                        idx = raw.find(marker)
+                        if idx != -1:
+                            cut = min(cut, idx)
+                    raw = raw[:cut].strip()
+                    if raw.endswith("._"):
+                        raw = raw[:-2]
+                    raw = raw.rstrip(".")
+                    if raw:
+                        results.append((raw, 0))
+                elif cap_name == "import.relative":
+                    # Python: `from . import x` / `from ..pkg import x`.
+                    # text starts with one or more dots, optionally followed by a dotted name.
+                    dots = len(text) - len(text.lstrip("."))
+                    rest = text[dots:]
+                    results.append((rest, dots))
+                else:
+                    results.append((text, 0))
+    return results
+
+
 def extract_symbols(path: Path):
-    """Returns (package, classes, methods, functions, ctor_calls)."""
+    """Returns (package, classes, methods, functions, ctor_calls, imports)."""
     lang    = LANG_MAP[path.suffix]
     queries = QUERIES[path.suffix]
     src     = path.read_bytes()
@@ -108,4 +146,6 @@ def extract_symbols(path: Path):
                 if best and ctor_node.text:
                     ctor_calls.append((best, ctor_node.text.decode()))
 
-    return package, list(classes.values()), methods, functions, ctor_calls
+    imports = extract_imports(root, queries)
+
+    return package, list(classes.values()), methods, functions, ctor_calls, imports
