@@ -73,8 +73,38 @@ def _to_graphology(G: nx.DiGraph) -> dict:
     }
 
 
+_TEMPLATE_PATH = Path(__file__).parent / "notebook_template.py"
+
+
+def _to_notebook() -> dict:
+    code = _TEMPLATE_PATH.read_text(encoding="utf-8")
+    return {
+        "cells": [
+            {
+                "cell_type": "code",
+                "execution_count": None,
+                "metadata": {},
+                "outputs": [],
+                "source": code.splitlines(keepends=True),
+            },
+        ],
+        "metadata": {
+            "kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
+            "language_info": {"name": "python"},
+        },
+        "nbformat": 4,
+        "nbformat_minor": 5,
+    }
+
+
 def write_graph_files(G: nx.DiGraph) -> None:
     out = Path("class_graph.json")
     with out.open("w", encoding="utf-8") as f:
         json.dump(_to_graphology(G), f, ensure_ascii=False, indent=2)
     print(f"\nGraph written to {out}")
+
+    nb = Path("class_graph.ipynb")
+    with nb.open("w", encoding="utf-8") as f:
+        json.dump(_to_notebook(), f, ensure_ascii=False, indent=1)
+    print(f"Notebook written to {nb}")
+    print(f"\nTo view, run:\n  uvx --with networkx --with ipysigma --with jupyter voila {nb}")

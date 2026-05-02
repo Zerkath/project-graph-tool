@@ -5,6 +5,14 @@ Simple python utility that scans source directories and produces a class graph a
 
 The output is consumable by [sigma.js] for rendering in the browser.
 
+A `class_graph.ipynb` Jupyter notebook is written alongside the JSON. Open it and run
+the cell to render the graph in-place with [ipysigma]:
+
+```sh
+pip install ipysigma networkx
+jupyter lab class_graph.ipynb
+```
+
 > [!TIP]
 > Usage:
 > 
