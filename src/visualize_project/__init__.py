@@ -24,7 +24,7 @@ from visualize_project.report import print_summary, write_graph_files
 
 def main() -> None:
     patterns = sys.argv[1:] or ["."]
-    dirs     = resolve_dirs(patterns)
+    dirs = resolve_dirs(patterns)
 
     print(f"Scanning {len(dirs)} director{'y' if len(dirs) == 1 else 'ies'}:")
     for d in dirs:

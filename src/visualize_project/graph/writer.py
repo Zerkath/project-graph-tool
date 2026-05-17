@@ -23,11 +23,20 @@ def _add_package(G: nx.DiGraph, package: str, sep: str = ".") -> None:
 
 def _add_module(G: nx.DiGraph, path: Path, package: str | None) -> str:
     module_id = str(path)
-    label     = python_module_name(path)
-    r, g, b   = node_colour("module")
-    G.add_node(module_id, kind="module", name=label, label=label,
-               file=str(path), package=package or "",
-               lang=path.suffix.lstrip("."), r=r, g=g, b=b)
+    label = python_module_name(path)
+    r, g, b = node_colour("module")
+    G.add_node(
+        module_id,
+        kind="module",
+        name=label,
+        label=label,
+        file=str(path),
+        package=package or "",
+        lang=path.suffix.lstrip("."),
+        r=r,
+        g=g,
+        b=b,
+    )
     if package:
         G.add_edge(package, module_id, rel="contains")
     return module_id
@@ -35,7 +44,7 @@ def _add_module(G: nx.DiGraph, path: Path, package: str | None) -> str:
 
 def _add_class(G: nx.DiGraph, cls: dict, parent: str | None) -> None:
     class_id = f"{cls['file']}::{cls['name']}"
-    r, g, b  = node_colour(cls.get("kind", "class"))
+    r, g, b = node_colour(cls.get("kind", "class"))
     G.add_node(class_id, kind="class", label=cls["name"], r=r, g=g, b=b, **cls)
     if parent:
         G.add_edge(parent, class_id, rel="contains")
@@ -43,15 +52,29 @@ def _add_class(G: nx.DiGraph, cls: dict, parent: str | None) -> None:
 
 def _add_method(G: nx.DiGraph, method: dict) -> None:
     r, g, b = node_colour("method")
-    G.add_node(method["id"], kind="method", label=method["name"], r=r, g=g, b=b,
-               **{k: v for k, v in method.items() if k != "id"})
+    G.add_node(
+        method["id"],
+        kind="method",
+        label=method["name"],
+        r=r,
+        g=g,
+        b=b,
+        **{k: v for k, v in method.items() if k != "id"},
+    )
     G.add_edge(method["class_id"], method["id"], rel="has_method")
 
 
 def _add_function(G: nx.DiGraph, fn: dict) -> None:
     r, g, b = node_colour("function")
-    G.add_node(fn["id"], kind="function", label=fn["name"], r=r, g=g, b=b,
-               **{k: v for k, v in fn.items() if k != "id"})
+    G.add_node(
+        fn["id"],
+        kind="function",
+        label=fn["name"],
+        r=r,
+        g=g,
+        b=b,
+        **{k: v for k, v in fn.items() if k != "id"},
+    )
     G.add_edge(fn["module_id"], fn["id"], rel="has_function")
 
 

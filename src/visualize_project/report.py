@@ -16,16 +16,20 @@ def _print_class_subtree(G: nx.DiGraph, class_id: str, indent: str) -> None:
 
 
 def print_summary(G: nx.DiGraph) -> None:
-    packages   = [(n, d) for n, d in G.nodes(data=True) if d.get("kind") == "package"]
-    modules    = [(n, d) for n, d in G.nodes(data=True) if d.get("kind") == "module"]
-    classes    = [(n, d) for n, d in G.nodes(data=True) if d.get("kind") == "class"]
-    methods    = [(n, d) for n, d in G.nodes(data=True) if d.get("kind") == "method"]
-    functions  = [(n, d) for n, d in G.nodes(data=True) if d.get("kind") == "function"]
-    inst_edges = [(u, v) for u, v, d in G.edges(data=True) if d.get("rel") == "instantiates"]
+    packages = [(n, d) for n, d in G.nodes(data=True) if d.get("kind") == "package"]
+    modules = [(n, d) for n, d in G.nodes(data=True) if d.get("kind") == "module"]
+    classes = [(n, d) for n, d in G.nodes(data=True) if d.get("kind") == "class"]
+    methods = [(n, d) for n, d in G.nodes(data=True) if d.get("kind") == "method"]
+    functions = [(n, d) for n, d in G.nodes(data=True) if d.get("kind") == "function"]
+    inst_edges = [
+        (u, v) for u, v, d in G.edges(data=True) if d.get("rel") == "instantiates"
+    ]
 
-    print(f"\nFound {len(packages)} packages, {len(modules)} modules, {len(classes)} classes, "
-          f"{len(methods)} methods, {len(functions)} functions, "
-          f"{len(inst_edges)} instantiation edges:\n")
+    print(
+        f"\nFound {len(packages)} packages, {len(modules)} modules, {len(classes)} classes, "
+        f"{len(methods)} methods, {len(functions)} functions, "
+        f"{len(inst_edges)} instantiation edges:\n"
+    )
 
     for pkg_id, pkg in sorted(packages, key=lambda x: x[1]["name"]):
         print(f"  pkg  {pkg['name']}")
@@ -63,8 +67,7 @@ def _to_graphology(G: nx.DiGraph) -> dict:
         },
         "attributes": {},
         "nodes": [
-            {"key": str(n), "attributes": dict(data)}
-            for n, data in G.nodes(data=True)
+            {"key": str(n), "attributes": dict(data)} for n, data in G.nodes(data=True)
         ],
         "edges": [
             {"source": str(u), "target": str(v), "attributes": dict(data)}
@@ -89,7 +92,11 @@ def _to_notebook() -> dict:
             },
         ],
         "metadata": {
-            "kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
+            "kernelspec": {
+                "display_name": "Python 3",
+                "language": "python",
+                "name": "python3",
+            },
             "language_info": {"name": "python"},
         },
         "nbformat": 4,
@@ -107,4 +114,6 @@ def write_graph_files(G: nx.DiGraph) -> None:
     with nb.open("w", encoding="utf-8") as f:
         json.dump(_to_notebook(), f, ensure_ascii=False, indent=1)
     print(f"Notebook written to {nb}")
-    print(f"\nTo view, run:\n  uvx --with networkx --with ipysigma --with jupyter voila {nb}")
+    print(
+        f"\nTo view, run:\n  uvx --with networkx --with ipysigma --with jupyter voila {nb}"
+    )
